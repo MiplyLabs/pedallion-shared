@@ -1,0 +1,19 @@
+[package]
+name = "pedallion-shared"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Pedallion licensing contract: lease, DTO and signed-manifest types plus Ed25519 sign/verify"
+repository = "https://github.com/MiplyLabs/pedallion-shared"
+license-file = "LICENSE"
+publish = false
+
+[dependencies]
+base64 = "0.22"
+ed25519-dalek = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.11"
+
+[dev-dependencies]
+getrandom = "0.3"

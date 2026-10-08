@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "quick": "make quick",
+  "format": "case {file} in *.rs) rustfmt --edition 2021 {file} ;; esac",
+  "fast": "make fast",
+  "full": "make full",
+  "security": "make security",
+  "skip_paths": [
+    "*.md",
+    "docs/*"
+  ]
+}

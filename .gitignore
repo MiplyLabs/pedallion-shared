@@ -1,0 +1,11 @@
+/target
+
+# Never commit key material: keygen output belongs in the server's secret store.
+.env
+.env.*
+*.pem
+*.key
+signing_key*
+
+.claude/worktrees/
+.omc/
