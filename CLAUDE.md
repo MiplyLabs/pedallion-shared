@@ -3,6 +3,7 @@ Licensing wire contract shared by the Pedallion client and license server. Publi
 
 ## Commands
 - `make quick` (fmt, clippy, tests) · `make fast` (+ staged secret scan) · `make full` (+ coverage) · `make security` (audit, semgrep, branch secret scan)
+- G4 runs `full` plus the `scans` in `.claude/gate.json` (secrets-branch, sast, audit, zizmor); CI runs the same in `.github/workflows/gate.yml`
 - `cargo run --example keygen` prints a key pair
 - `scripts/release_notes.sh X.Y.Z` prints a version's CHANGELOG section
 
