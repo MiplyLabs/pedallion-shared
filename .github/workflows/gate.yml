@@ -1,0 +1,56 @@
+# G5: the same checks as G4 (`full` and each scan from .claude/gate.json), as a backstop for pushes made
+# outside Claude. Written by /gate setup from ~/.claude/skills/gate/gate.yml.template.
+# Rules: push and pull_request only (never pull_request_target), read-only token, third-party actions pinned
+# by commit SHA, no secrets.
+name: gate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
+        with:
+          fetch-depth: 0          # the secrets scan and diff-cover compare against origin/master
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249   # stable branch
+        with:
+          toolchain: stable
+          components: rustfmt, clippy, llvm-tools-preview
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8   # v2.87.28
+        with:
+          tool: cargo-llvm-cov,cargo-audit
+      - name: diff-cover
+        run: pipx install diff-cover
+
+      - name: Install scan tools
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+            echo /home/linuxbrew/.linuxbrew/bin >> "$GITHUB_PATH"
+          fi
+          brew install gitleaks osv-scanner trivy zizmor jq
+          pipx install semgrep
+
+      - name: full
+        run: bash -c "$(jq -r '.full' .claude/gate.json)"
+
+      - name: scans
+        run: |
+          for c in secrets sast deps iac; do
+            cmd="$(jq -r --arg c "$c" '.scans[$c] // empty | strings' .claude/gate.json)"
+            case "$cmd" in
+              "") echo "– $c: not set"; continue ;;
+              none:*) echo "– $c: ${cmd}"; continue ;;
+            esac
+            echo "▶ $c: $cmd"
+            bash -c "$cmd"
+          done
