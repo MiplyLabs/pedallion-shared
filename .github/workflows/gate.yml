@@ -5,7 +5,9 @@
 name: gate
 
 on:
+  # Push only to the default branch: a push to a PR branch already runs as pull_request.
   push:
+    branches: [master]
   pull_request:
 
 permissions:
